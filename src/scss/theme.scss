@@ -1,9 +1,49 @@
 @import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "@fortawesome/fontawesome-free/scss/regular.scss";
+@import "@fortawesome/fontawesome-free/scss/solid.scss";
+@import "@fortawesome/fontawesome-free/scss/brands.scss";
+
 @import "bootstrap/scss/bootstrap";
 
-.header {
-  color: red;
-  p {
-    color: blue;
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+$color-primary: #67A7FF;
+
+$font-primary: 'Roboto', sans-serif;
+
+html,
+body {
+  height: 100vh;
+  font-family: $font-primary;
+}
+
+.image-uploader {
+
+  input[name='file_upload'] {
+    display: none;  // Hide the file uploader & use the label instead.
   }
+
+  label[for='file_upload'] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 200px;
+    height: 200px;
+    border: 1px solid $color-primary;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #f0f8ff;
+    }
+
+    i {
+      font-size: 60px;
+      color: $color-primary;
+    }
+  }
+
 }

@@ -81,16 +81,24 @@ function copy_fonts() {
 /*************************
  * watch
  ************************/
+task('watch-files', watch_files);
+
+function watch_files() {
+  watch(paths.src.scss, scss);
+  watch(paths.src.js, js);
+}
+
 task('watch-browsersync', watch_browsersync);
 
 function watch_browsersync() {
   browsersync.init({
-    server: './dist/'
+    proxy: 'http://localhost:83/ez-imageresizer/'
   });
 
   // Watchers
   watch(paths.src.scss, scss);
   watch(paths.src.js, js);
+  watch('index.php').on('change', browsersync.reload);
   watch('./dist').on('change', browsersync.reload);
   watch('./src').on('change', browsersync.reload);
 }
@@ -99,5 +107,6 @@ function watch_browsersync() {
 exports.scss = scss;
 exports.js = js;
 exports.fonts = fonts;
-exports.copyFonts = copy_fonts;
+exports.copy_fonts = copy_fonts;
+exports.watch_files = watch_files;
 exports.default = series(scss, js, series(copy_fonts, fonts));
