@@ -1,3 +1,9 @@
-.test {
+@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "bootstrap/scss/bootstrap";
+
+.header {
   color: red;
+  p {
+    color: blue;
+  }
 }

@@ -6,44 +6,42 @@
  * 02/08/2019
  */
 
-// Imports
+/*************************
+ * imports
+ ************************/
 const { src, dest, series, task, watch } = require('gulp');
 const babel = require('gulp-babel');
+const sass = require('gulp-sass');
 const rename = require('gulp-rename');
 const uglify = require('gulp-uglify');
 const concat = require('gulp-concat');
+const copy = require('gulp-copy');
 const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
 const browsersync = require('browser-sync');
+const log = require('fancy-log');
 
-// Settings
-const names = {
-  dest: {
-    scss: 'styles.css',
-    js: 'scripts.js'
-  }
-}
+const { names, paths } = require('./gulpconfig');
 
-// Paths
-const paths = {
-  src: {
-    scss: 'src/scss/**/*.scss',   // The path to all scss files. This is only used for watching.
-    js: 'src/js/**/*.js',            // The path to all javascript files. This is only used for watching.
-  },
-  dest: {
-    scss: 'dist/css',
-    js: 'dist/js'
-  }
-};
-
-// Tasks
+/*************************
+ * scss
+ ************************/
 task('scss', scss);
 
 function scss() {
   return src(paths.src.scss)
+    .pipe(sass({
+      includePaths: ['node_modules']
+    }).on('error', sass.logError))
+    .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename({ extname: '.min.css' }))
     .pipe(dest(paths.dest.scss));
 }
 
+
+/*************************
+ * js
+ ************************/
 task('js', js);
 
 function js() {
@@ -57,6 +55,32 @@ function js() {
     .pipe(dest(paths.dest.js));
 }
 
+
+/*************************
+ * fonts
+ ************************/
+task('fonts', fonts);
+
+function fonts() {
+  log('Copying fonts from src/fonts to dist/fonts')
+  return src(paths.src.fonts + '*')
+  .pipe(dest(paths.dest.fonts));
+}
+
+task('copy-fonts', copy_fonts);
+
+function copy_fonts() {
+  log('Copying fonts from node_modules..');
+  return src(
+    [paths.node_modules + '/@fortawesome/fontawesome-free/webfonts/*']
+    )
+    .pipe(copy(paths.src.fonts, { prefix: 4 }))
+    .pipe(dest(paths.src.fonts));
+}
+
+/*************************
+ * watch
+ ************************/
 task('watch-browsersync', watch_browsersync);
 
 function watch_browsersync() {
@@ -72,7 +96,8 @@ function watch_browsersync() {
 }
 
 // Exports
-exports.watch = watch;
 exports.scss = scss;
 exports.js = js;
-exports.default = series(scss, js);
+exports.fonts = fonts;
+exports.copyFonts = copy_fonts;
+exports.default = series(scss, js, series(copy_fonts, fonts));
