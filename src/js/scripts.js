@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 
-  const header = new Header();
+  const imageUploader = new ImageUploader();
 
 });

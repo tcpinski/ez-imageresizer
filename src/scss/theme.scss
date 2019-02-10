@@ -6,10 +6,14 @@
 @import "bootstrap/scss/bootstrap";
 
 @import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Raleway:900');
 
 $color-primary: #67A7FF;
+$color-secondary: #ff6767;
+$color-tertiary: #3ec13e;
 
 $font-primary: 'Roboto', sans-serif;
+$font-secondary: 'Raleway', sans-serif;
 
 html,
 body {
@@ -17,7 +21,23 @@ body {
   font-family: $font-primary;
 }
 
-.image-uploader {
+.header-main {
+
+  .header-main__logo {
+    max-width: 350px;
+
+    a {
+      max-width: 350px;
+
+      image {
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+// Image Uploader
+#image-uploader {
 
   input[name='file_upload'] {
     display: none;  // Hide the file uploader & use the label instead.
@@ -43,6 +63,66 @@ body {
     i {
       font-size: 60px;
       color: $color-primary;
+    }
+  }
+
+  input[type='submit'] {
+    position: relative;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: $color-primary;
+      color: white;
+
+      &:hover { 
+        background: $color-tertiary;
+      }
+    }
+
+    &:hover {
+      box-shadow: 0 6px 12px rgba(black, 0.05);
+    }
+  }
+
+  .image-uploader__list {
+    transition: all 0.3s ease;
+    transform: translateX(-300%);
+
+    &.active {
+      transform: translateX(0);
+    }
+
+    h3 {
+      position: relative;
+      font-family: $font-secondary;
+      font-size: 21px;
+
+      &::after {
+        position: absolute;
+        content: '';
+        bottom: -10px;
+        left: 0;
+        height: 4px;
+        width: 100%;
+        background: $color-primary;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding:  10px 0 0 0;
+
+      li {
+        text-align: left;
+        
+        .byte-size {
+          margin-left: 10px;
+          font-size: 12px;
+        }
+      }
     }
   }
 

@@ -12,8 +12,8 @@
 </head>
 <body>
   
-  <header class="header-main container pt-5 mb-5">
-    <div class="header-main__logo col-8 offset-2">
-      <?php the_logo(); ?>
+  <header class="header-main container mt-2 mb-5">
+    <div class="header-main__logo col-12">
+      <?php //the_logo(); ?>
     </div>
   </header>
