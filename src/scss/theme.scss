@@ -39,7 +39,7 @@ body {
 // Image Uploader
 #image-uploader {
 
-  input[name='file_upload'] {
+  #file_upload {
     display: none;  // Hide the file uploader & use the label instead.
   }
 
@@ -105,7 +105,7 @@ body {
         content: '';
         bottom: -10px;
         left: 0;
-        height: 4px;
+        height: 1px;
         width: 100%;
         background: $color-primary;
       }

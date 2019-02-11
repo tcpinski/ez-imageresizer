@@ -14,12 +14,14 @@ class ImageUploader {
   bindEvents() {
 
     this.elForm.addEventListener('submit', (event) => {
+      /*
       if (this.state.files.length <= 0) {
         event.preventDefault();
       }
-     
+      */
+      //event.preventDefault();
+      //this.postInput();
     });
-
     
     this.elFileInput.addEventListener('change', (event) => {
 
@@ -37,6 +39,27 @@ class ImageUploader {
       }
 
     });
+  }
+
+  /**
+   * Posts the uploaded files to the server. The server will generate the images.
+   */
+  postInput() {
+    const url = '?action_submit';
+
+    let formData = new FormData();
+
+    Array.from(this.state.files).forEach( file => {
+      formData.append('file_upload[]', file);
+    });
+
+    let request = new XMLHttpRequest();
+    request.addEventListener('load', () => {
+      console.log(request.response);
+    });
+
+    request.open('POST' , url);
+    request.send(formData);
   }
 
   /**
