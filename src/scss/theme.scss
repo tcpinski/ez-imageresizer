@@ -88,8 +88,8 @@ body {
   }
 
   .image-uploader__list {
-    transition: all 0.3s ease;
-    transform: translateX(-300%);
+    transition: all 0.6s ease;
+    transform: translateX(-1000%);
 
     &.active {
       transform: translateX(0);
