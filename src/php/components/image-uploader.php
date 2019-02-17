@@ -10,8 +10,10 @@ class ImageUploader {
 
   private $max_file_size = 8000000; // 1Mb = 8e+6bytes
   private $output_directory = 'images/';
+  private $zip_name = 'resized-images'; // Today's date is postfixed during zipImages();
   private $image_size_small = 768;
   private $image_size_medium = 992;
+  private $image_size_large = 1200;
 
   function __construct() {
 
@@ -30,12 +32,10 @@ class ImageUploader {
 
       foreach ($uploaded_files['tmp_name'] as $index=>$file_tmp_name) {
         $this->resizeImage($file_tmp_name, $uploaded_files['name'][$index]);
-
-
       }
 
-      // $this->zipImages();
-      // $this->cleanOutputDirectory();
+      $this->zipImages();
+      $this->cleanOutputDirectory();
 
     }
   }
@@ -45,10 +45,12 @@ class ImageUploader {
    */
   function zipImages() {
     $zip = new ZipArchive();
-    $compress = $zip->open("images/images.zip", ZIPARCHIVE::CREATE);
+    $zip->open($this->zip_name . '-' . date('d-m-Y') . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-    if ($compress === true) {
-      $zip->addFile($image);
+    $files = glob($this->output_directory . "*");
+
+    foreach($files as $file) {
+      $zip->addFile($file);
     }
 
     $zip->close();
@@ -58,7 +60,13 @@ class ImageUploader {
    * Cleans the output directory by deleting all of the files inside.
    */
   function cleanOutputDirectory() {
+    $files = glob($this->output_directory . '*');
 
+    foreach($files as $file) {
+      if (is_file($file)) {
+        unlink($file);
+      }
+    }
   }
 
   /**
@@ -82,49 +90,47 @@ class ImageUploader {
     $image_width = getimagesize($file_tmp_name)[0];
 
     // Small Image
-    if ($image_width < 768) {
+    if ($image_width < $this->image_size_small) {
 
       // Low Resolution
-      $this->saveImage($file_tmp_name, $image_name . '-lr', $image_type, 10);
+      $this->saveImage($file_tmp_name, $image_name . '-low-res', $image_type, 10);
 
       // Same size
-      $this->saveImage($file_tmp_name, $image_name . '-sm', $image_type, 100);
+      $this->saveImage($file_tmp_name, $image_name . '-small', $image_type, 100);
     }
 
     // Medium Image
-    if ($image_width >= 768 && $image_width < 1200) {
+    if ($image_width >= $this->image_size_small && $image_width < $this->image_size_medium) {
     
       // Low Resolution
-      $this->saveImage($file_tmp_name, $image_name . '-lr', $image_type, 10);
+      $this->saveImage($file_tmp_name, $image_name . '-low-res', $image_type, 10);
 
       // Small
-      $this->saveImage($file_tmp_name, $image_name . '-sm', $image_type, 100, 'sm');
+      $this->saveImage($file_tmp_name, $image_name . '-small', $image_type, 100, 'sm');
 
       // Same size
-      $this->saveImage($file_tmp_name, $image_name . '-md', $image_type, 100);
+      $this->saveImage($file_tmp_name, $image_name . '-medium', $image_type, 100);
     }
 
     // large Image
-    if ($image_width > 1200) {
+    if ($image_width > $this->image_size_large) {
 
       // Low Resolution
-      $this->saveImage($file_tmp_name, $image_name . '-lr', $image_type, 10);
+      $this->saveImage($file_tmp_name, $image_name . '-low-res', $image_type, 10);
 
       // Small
-      $this->saveImage($file_tmp_name, $image_name . '-sm', $image_type, 100, 'sm');
+      $this->saveImage($file_tmp_name, $image_name . '-small', $image_type, 100, 'sm');
 
       // Medium
-      $this->saveImage($file_tmp_name, $image_name . '-md', $image_type, 100, 'md');
+      $this->saveImage($file_tmp_name, $image_name . '-medium', $image_type, 100, 'md');
 
       // Same size
-      $this->saveImage($file_tmp_name, $image_name . '-lg', $image_type, 100);
+      $this->saveImage($file_tmp_name, $image_name . '-large', $image_type, 100);
     }
   }
 
   /**
    * Saves an image to /images.
-   * 
-   * TODO: Resize the images.
    */
   function saveImage($file_tmp_name, $image_name, $image_type, $quality, $size = null) {
 
@@ -140,7 +146,7 @@ class ImageUploader {
 
       // Resize the image
       if ($size) {
-
+        $image = $this->setImageWidth($image, $file_tmp_name, $size);
       }
 
       imagepng($image, $destination, $quality);
@@ -152,12 +158,37 @@ class ImageUploader {
 
       // Resize the image
       if ($size) {
-
+        $image = $this->setImageWidth($image, $file_tmp_name, $size);
       }
 
       imagejpeg($image, $destination, $quality);
       imagedestroy($image);
     }
+  }
+
+  /**
+   * Resizes the image to the specified width while keeping the aspect ratio and returns it.
+   */
+  function setImageWidth($image, $file_tmp_name, $size) {
+
+    $new_width = 0;
+
+    switch ($size) {
+      case 'sm':
+        $new_width = $this->image_size_small;
+        break;
+      case 'md':
+        $new_width = $this->image_size_medium;
+        break;
+    }
+    
+    list($image_width, $image_height) = getimagesize($file_tmp_name);
+
+    $new_height = ($image_height / $image_width) * $new_width;
+    $tmp_image = imagecreatetruecolor($new_width, $new_height);
+    imagecopyresampled($tmp_image, $image, 0, 0, 0, 0, $new_width, $new_height, $image_width, $image_height);
+
+    return $tmp_image;
   }
 
   function renderForm() { ?>
